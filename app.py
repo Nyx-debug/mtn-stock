@@ -42,8 +42,12 @@ df["Volume"] = df["Volume"].apply(parse_volume)
 df = df.sort_values("Date").reset_index(drop=True)
 
 # ── Load metrics ──
-with open("results/metrics.json") as f:
-    metrics = json.load(f)
+metrics = None
+try:
+    with open("results/metrics.json") as f:
+        metrics = json.load(f)
+except FileNotFoundError:
+    pass
 
 st.set_page_config(layout="wide")
 st.title("📈 MTN Nigeria Stock Prediction Dashboard")
@@ -79,10 +83,13 @@ st.markdown("---")
 
 st.subheader("🤖 Model Performance")
 
-col1, col2, col3 = st.columns(3)
-col1.metric("MAE (₦)", f"{metrics['MAE']:.2f}")
-col2.metric("RMSE (₦)", f"{metrics['RMSE']:.2f}")
-col3.metric("R² Score", f"{metrics['R2']:.3f}")
+if metrics:
+    col1, col2, col3 = st.columns(3)
+    col1.metric("MAE (₦)", f"{metrics['MAE']:.2f}")
+    col2.metric("RMSE (₦)", f"{metrics['RMSE']:.2f}")
+    col3.metric("R² Score", f"{metrics['R2']:.3f}")
+else:
+    st.info("📊 Metrics not available. Run `python main.py` locally to generate evaluation metrics.")
 
 st.markdown("---")
 
